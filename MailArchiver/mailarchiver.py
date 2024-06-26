@@ -1,6 +1,10 @@
 from tkinter import *
 import tkinter as tk
+from tkinter import scrolledtext
 import sys
+import json
+import os
+import datetime
 
 
 windowMenu = Tk()
@@ -26,13 +30,30 @@ def read():
     canvasTop.create_rectangle(0, 0, 1600, 50, fill="black")
     canvasTop.place(x=0,y=0)
 
+
+##################### --- Main Read
+
+
+
     titleMain = Label(windowRead, text="***-- Read mode --***", font=20, background="maroon1")
     titleMain.place(x=650, y=5, width=300, height=40)
 
+    listbox_frameMain = tk.Frame(windowRead)
+    listbox_frameMain.place(x=400, y=100, width=1100, height=750)
+
+    listboxMain = Listbox(listbox_frameMain,)
+    listboxMain.pack(side="left", fill="both", expand=True)
+
+    scrollbarMain = Scrollbar(listbox_frameMain, orient="vertical", command=listboxMain.yview)
+    scrollbarMain.pack(side="right", fill="y")
+    listboxMain.config(yscrollcommand=scrollbarMain.set)
+
+
+##################### --- Left Read
+
+
     titleAuthor = Label(windowRead, text="*- Authors' list -*", background="lightpink1", font=16)
     titleAuthor.place(x=50, y=85, width=200, height=30)
-
-
 
     listbox_frameLeft = tk.Frame(windowRead)
     listbox_frameLeft.place(x=25, y=150, width=250, height=300)
@@ -49,23 +70,13 @@ def read():
 
 
 
-    listbox_frameMain = tk.Frame(windowRead)
-    listbox_frameMain.place(x=400, y=150, width=1100, height=650)
-
-    listboxMain = Listbox(listbox_frameMain,)
-    listboxMain.pack(side="left", fill="both", expand=True)
-
-    scrollbarMain = Scrollbar(listbox_frameMain, orient="vertical", command=listboxMain.yview)
-    scrollbarMain.pack(side="right", fill="y")
-    listboxMain.config(yscrollcommand=scrollbarMain.set)
-
-
-
-
 
 
 ##############################################
 ##############################################
+##############################################
+
+
 def add():
     windowAdd = Tk()
     windowAdd.title("Mail Archiver")
@@ -82,13 +93,20 @@ def add():
     canvasTop.create_rectangle(0, 0, 1600, 50, fill="black")
     canvasTop.place(x=0,y=0)
 
+##################### --- Main Add
 
     titleMain = Label(windowAdd, text="***-- Add mode --***", font=18, background="maroon1")
     titleMain.place(x=650, y=10, width=300, height=30)
 
+    inputMessage = scrolledtext.ScrolledText(windowAdd, wrap=tk.WORD)
+    inputMessage.place(x=400, y=100, width=1100, height=750)
+
+
+##################### --- Left Add
+
+
     titleAuthor = Label(windowAdd, text="*- Authors' list -*", font=16, background="lightpink1")
     titleAuthor.place(x=50, y=85, width=200, height=30)
-
 
     listbox_frameLeft = tk.Frame(windowAdd)
     listbox_frameLeft.place(x=25, y=150, width=250, height=300)
@@ -117,23 +135,60 @@ def add():
     inputDate["justify"]="center"
     inputDate.insert(0, "jj/mm/yy")
 
+##################### --- Fonctions
+
+    def show_popup():
+    
+        popup = Tk()
+        popup.title("Status")
+        popup.geometry("350x130")
+        popup["bg"]="black"
+        
+        label = Label(popup, text="Message archived successfully", font=16, background="palegreen" )
+        label.place(x=25,y=35, width=300, height=60)
+        
+        popup.after(2000, popup.destroy)
+        
+        popup.mainloop()
+
     def archive():
-        print("hello")
+        author = inputAuthor.get()
+        date = inputDate.get()
+        message = inputMessage.get("1.0", tk.END)
+
+        newdata = {date : message}
+        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        file_name = f"{author}.json"
+        file_path = os.path.join(folder_path, file_name)
+
+        if os.path.exists(file_path):
+            with open(file_path, "r") as json_file:
+                data = json.load(json_file)
+        else:
+            data = {}
+
+        data.update(newdata)
+
+        sorted_data = dict(sorted(data.items(), key=lambda item: datetime.datetime.strptime(item[0], "%d/%m/%y")))
+
+        with open (file_path, "w") as json_file:
+            json.dump(sorted_data, json_file, indent=4)
+
+        # inputAuthor.set("")
+        # inputDate.set("")
+        # inputMessage.delete("1.0", tk.END)
+
+        show_popup()
+
+
+        
+       
+
 
     buttonArchive = Button(windowAdd, text="Archive message", command=archive, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
     buttonArchive.place(x=50, y=690, width=200, height=40)
 
 
-
-    listbox_frameMain = tk.Frame(windowAdd)
-    listbox_frameMain.place(x=400, y=150, width=1100, height=650)
-
-    listboxMain = Listbox(listbox_frameMain,)
-    listboxMain.pack(side="left", fill="both", expand=True)
-
-    scrollbarMain = Scrollbar(listbox_frameMain, orient="vertical", command=listboxMain.yview)
-    scrollbarMain.pack(side="right", fill="y")
-    listboxMain.config(yscrollcommand=scrollbarMain.set)
 
 
 
@@ -145,7 +200,7 @@ def readme():
     windowAdd.geometry("600x450")
     windowAdd["bg"]="black"
 
-    titleReadme = Label(windowAdd, text="### To read archived messages, go to Read mode,\n enter one author from the list in the form\n and click load messages.\n\n\n### To add a message to the archive, select the Add mode,\n enter an existing author from the list or a new one,\n a date in the right format and finally paste and edit\n your message in the main input form. You can then click\n the archive button and be safe.", font=14, background="palegreen")
+    titleReadme = Label(windowAdd, text="### To read archived messages, go to Read mode,\n enter one author from the list in the form\n and click load messages.\n\n\n### To add a message to the archive, select the Add mode,\n enter an existing author from the list or a new one,\n a date in the right format and finally paste and edit\n your message in the main input form. You can then click\n the archive button and be safe.\n\n\n -cCrapiXx-", font=14, background="palegreen")
     titleReadme.place(x=30, y=50, width=540, height=350)
 
 ##############################################
