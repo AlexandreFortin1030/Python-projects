@@ -58,15 +58,15 @@ def read():
     titleMain = Label(windowRead, text="***-- Read mode --***", font=20, background="maroon1")
     titleMain.place(x=650, y=5, width=300, height=40)
 
-    listbox_frameMain = tk.Frame(windowRead)
-    listbox_frameMain.place(x=400, y=100, width=1100, height=750)
+    textMain_frame = tk.Frame(windowRead)
+    textMain_frame.place(x=400, y=100, width=1100, height=750)
 
-    listboxMain = Listbox(listbox_frameMain,)
-    listboxMain.pack(side="left", fill="both", expand=True)
+    textMain = Text(textMain_frame)
+    textMain.pack(side="left", fill="both", expand=True)
 
-    scrollbarMain = Scrollbar(listbox_frameMain, orient="vertical", command=listboxMain.yview)
+    scrollbarMain = Scrollbar(textMain_frame, orient="vertical", command=textMain.yview)
     scrollbarMain.pack(side="right", fill="y")
-    listboxMain.config(yscrollcommand=scrollbarMain.set)
+    textMain.config(yscrollcommand=scrollbarMain.set)
 
 
 ##################### --- Left Read
@@ -111,19 +111,9 @@ def read():
         
         with open(file_path, "r") as json_file:
             data = json.load(json_file)
-            listboxMain.delete(0, tk.END)
+            textMain.delete(1.0, tk.END)
             for key, value in data.items():
-                listboxMain.insert(tk.END, key)
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, value)
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "#")
-                listboxMain.insert(tk.END, "###########################################################################################################")
+                textMain.insert(tk.END, f"{key}\n{value}\n\n\n\n")
 
 
     buttonLoadLeft = Button(windowRead, text="Load messages", command=loadMessage, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
@@ -207,7 +197,7 @@ def add():
         label = Label(popup, text="Message archived successfully", font=16, background="palegreen" )
         label.place(x=25,y=35, width=300, height=60)
         
-        popup.after(2000, popup.destroy)
+        popup.after(1500, popup.destroy)
         
         popup.mainloop()
 
