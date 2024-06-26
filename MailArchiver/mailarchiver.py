@@ -31,6 +31,26 @@ def read():
     canvasTop.place(x=0,y=0)
 
 
+###################################### --- Functions
+
+
+    def read_file_names(folder_path):
+
+        file_names = []
+        
+        for file in os.listdir(folder_path):
+            
+            full_path = os.path.join(folder_path, file)
+            if os.path.isfile(full_path):
+                file_name_with_extension = os.path.basename(file)
+                file_name, file_extension = os.path.splitext(file_name_with_extension)
+                file_names.append(file_name)
+        
+        return file_names
+    
+    
+
+
 ##################### --- Main Read
 
 
@@ -55,19 +75,59 @@ def read():
     titleAuthor = Label(windowRead, text="*- Authors' list -*", background="lightpink1", font=16)
     titleAuthor.place(x=50, y=85, width=200, height=30)
 
+
     listbox_frameLeft = tk.Frame(windowRead)
     listbox_frameLeft.place(x=25, y=150, width=250, height=300)
 
+
     listboxLeft = Listbox(listbox_frameLeft,)
     listboxLeft.pack(side="left", fill="both", expand=True)
+
+    folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+    file_names = read_file_names(folder_path)
+    for file_name in file_names:
+        listboxLeft.insert(tk.END, file_name)
+
 
     scrollbarLeft = Scrollbar(listbox_frameLeft, orient="vertical", command=listboxLeft.yview)
     scrollbarLeft.pack(side="right", fill="y")
     listboxLeft.config(yscrollcommand=scrollbarLeft.set)
 
-    buttonLoadLeft = Button(windowRead, text="Load messages",background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
-    buttonLoadLeft.place(x=50, y=600, width=200, height=40)
 
+    chooseAuthor = Label(windowRead, text="- Enter author -", background="lightpink1", font=16)
+    chooseAuthor.place(x=75, y=480, width=150, height=30)
+
+    inputAuthor = Entry(windowRead)
+    inputAuthor.place(x=50, y=520, width=200, height=30)
+    inputAuthor["justify"]="center"
+
+
+    def loadMessage():
+
+        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"  # Remplacez par votre chemin
+        file_name = inputAuthor.get() + ".json"
+        file_path = os.path.join(folder_path, file_name)
+
+        
+        with open(file_path, "r") as json_file:
+            data = json.load(json_file)
+            listboxMain.delete(0, tk.END)
+            for key, value in data.items():
+                listboxMain.insert(tk.END, key)
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, value)
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "#")
+                listboxMain.insert(tk.END, "###########################################################################################################")
+
+
+    buttonLoadLeft = Button(windowRead, text="Load messages", command=loadMessage, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
+    buttonLoadLeft.place(x=50, y=590, width=200, height=40)
 
 
 
@@ -174,9 +234,9 @@ def add():
         with open (file_path, "w") as json_file:
             json.dump(sorted_data, json_file, indent=4)
 
-        # inputAuthor.set("")
-        # inputDate.set("")
-        # inputMessage.delete("1.0", tk.END)
+        inputAuthor.delete("0", tk.END)
+        inputDate.delete("0", tk.END)
+        inputMessage.delete("1.0", tk.END)
 
         show_popup()
 
