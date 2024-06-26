@@ -61,7 +61,7 @@ def read():
     textMain_frame = tk.Frame(windowRead)
     textMain_frame.place(x=400, y=100, width=1100, height=750)
 
-    textMain = Text(textMain_frame)
+    textMain = Text(textMain_frame, wrap=tk.WORD)
     textMain.pack(side="left", fill="both", expand=True)
 
     scrollbarMain = Scrollbar(textMain_frame, orient="vertical", command=textMain.yview)
