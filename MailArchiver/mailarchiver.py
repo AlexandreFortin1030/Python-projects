@@ -147,7 +147,7 @@ def read():
     buttonLoadLeft = Button(windowRead, text="Load messages", command=loadMessage, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
     buttonLoadLeft.place(x=50, y=590, width=200, height=40)
 
-    buttonDeleteLeft = Button(windowRead, text="Delte message", command=deleteMessageById, background="maroon1", activebackground="red", font=18, highlightthickness=0)
+    buttonDeleteLeft = Button(windowRead, text="Delete message", command=deleteMessageById, background="maroon1", activebackground="red", font=18, highlightthickness=0)
     buttonDeleteLeft.place(x=50, y=660, width=200, height=30)
 
 
