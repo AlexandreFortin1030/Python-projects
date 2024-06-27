@@ -161,12 +161,61 @@ def add():
     listbox_frameLeft = tk.Frame(windowAdd)
     listbox_frameLeft.place(x=25, y=150, width=250, height=300)
 
-    listboxLeft = Listbox(listbox_frameLeft,)
-    listboxLeft.pack(side="left", fill="both", expand=True)
+    listboxLeftAdd = Listbox(listbox_frameLeft,)
+    listboxLeftAdd.pack(side="left", fill="both", expand=True)
 
-    scrollbarLeft = Scrollbar(listbox_frameLeft, orient="vertical", command=listboxLeft.yview)
+    
+    def read_file_names(folder_path):
+
+        file_names = []
+        
+        for file in os.listdir(folder_path):
+            
+            full_path = os.path.join(folder_path, file)
+            if os.path.isfile(full_path):
+                file_name_with_extension = os.path.basename(file)
+                file_name, file_extension = os.path.splitext(file_name_with_extension)
+                file_names.append(file_name)
+        
+        return file_names
+
+
+    folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+    file_names = read_file_names(folder_path)
+    for file_name in file_names:
+        listboxLeftAdd.insert(tk.END, file_name)
+
+
+
+    scrollbarLeft = Scrollbar(listbox_frameLeft, orient="vertical", command=listboxLeftAdd.yview)
     scrollbarLeft.pack(side="right", fill="y")
-    listboxLeft.config(yscrollcommand=scrollbarLeft.set)
+    listboxLeftAdd.config(yscrollcommand=scrollbarLeft.set)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     titleEnterAuthor = Label(windowAdd, text="- Enter author -", font=14, background="lightpink1")
