@@ -1,6 +1,6 @@
 from tkinter import *
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, simpledialog
 import sys
 import json
 import os
@@ -102,6 +102,30 @@ def read():
     inputAuthor["justify"]="center"
 
 
+    def deleteMessageById():
+        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        author = inputAuthor.get() 
+        file_name = f"{author}.json"
+        file_path = os.path.join(folder_path, file_name)
+        
+        message_id = simpledialog.askstring("Input", "Enter the ID of the message to delete:")
+        
+        if message_id is None:
+            return
+        
+        with open(file_path, "r") as json_file:
+            data = json.load(json_file)
+            
+        if message_id in data:
+            del data[message_id]
+            with open(file_path, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+            print(f"Message with ID {message_id} has been deleted.")
+            loadMessage()  # Reload messages to update the display
+        else:
+            print(f"No message with ID {message_id} found.")
+
+
     def loadMessage():
 
         folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"  # Remplacez par votre chemin
@@ -113,11 +137,18 @@ def read():
             data = json.load(json_file)
             textMain.delete(1.0, tk.END)
             for key, value in data.items():
-                textMain.insert(tk.END, f"{key}\n{value}\n\n\n\n")
+                inner_key = list(value.keys())[0]
+                inner_value = value[inner_key]
+                textMain.insert(tk.END, f"Message ID: {key}\n\nDate: {inner_key}\n\n{inner_value}\n\n\n\n")
+
+
 
 
     buttonLoadLeft = Button(windowRead, text="Load messages", command=loadMessage, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
     buttonLoadLeft.place(x=50, y=590, width=200, height=40)
+
+    buttonDeleteLeft = Button(windowRead, text="Delte message", command=deleteMessageById, background="maroon1", activebackground="red", font=18, highlightthickness=0)
+    buttonDeleteLeft.place(x=50, y=660, width=200, height=30)
 
 
 
@@ -191,33 +222,6 @@ def add():
     scrollbarLeft.pack(side="right", fill="y")
     listboxLeftAdd.config(yscrollcommand=scrollbarLeft.set)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     titleEnterAuthor = Label(windowAdd, text="- Enter author -", font=14, background="lightpink1")
     titleEnterAuthor.place(x=75, y=480, width=150, height=30)
 
@@ -250,12 +254,24 @@ def add():
         
         popup.mainloop()
 
+
     def archive():
         author = inputAuthor.get()
         date = inputDate.get()
-        message = inputMessage.get("1.0", tk.END)
 
-        newdata = {date : message}
+        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        file_name = f"{author}.json"
+        file_path = os.path.join(folder_path, file_name)
+        message = inputMessage.get("1.0", tk.END)
+        
+        if os.path.exists(file_path):
+            with open(file_path, "r") as json_file:
+                data = json.load(json_file)    
+                id = len(data) + 1
+        else:
+            id = 1       
+
+        newdata = {id:{date : message}}
         folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
         file_name = f"{author}.json"
         file_path = os.path.join(folder_path, file_name)
@@ -268,7 +284,16 @@ def add():
 
         data.update(newdata)
 
-        sorted_data = dict(sorted(data.items(), key=lambda item: datetime.datetime.strptime(item[0], "%d/%m/%y")))
+
+            # Trier les données par date
+        def get_date(item):
+            # La clé du dictionnaire imbriqué (date) est la première et unique clé
+            nested_dict = list(item[1].keys())[0]
+            return datetime.datetime.strptime(nested_dict, "%d/%m/%y")
+
+        sorted_data = dict(sorted(data.items(), key=get_date))
+
+    
 
         with open (file_path, "w") as json_file:
             json.dump(sorted_data, json_file, indent=4)
@@ -286,6 +311,9 @@ def add():
 
     buttonArchive = Button(windowAdd, text="Archive message", command=archive, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
     buttonArchive.place(x=50, y=690, width=200, height=40)
+
+
+
 
 
 
