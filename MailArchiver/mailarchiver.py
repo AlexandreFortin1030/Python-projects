@@ -5,12 +5,21 @@ import sys
 import json
 import os
 import datetime
+import pygame
 
+pygame.mixer.init()
+
+def play_sound_in_loop():
+    pygame.mixer.music.load("RessourceMenu/yung lean ~ ginseng strip 2002 (instrumental slowed+reverb) (256).mp3")
+    pygame.mixer.music.play(loops=-1)
 
 windowMenu = Tk()
+play_sound_in_loop() 
 windowMenu.title("Mail Archiver")
 windowMenu.geometry("600x400")
 windowMenu["bg"]="mediumorchid2"
+
+
 
 #############################################
 #############################################
@@ -298,6 +307,16 @@ def add():
         with open (file_path, "w") as json_file:
             json.dump(sorted_data, json_file, indent=4)
 
+
+        listboxLeftAdd.delete(0, tk.END)
+
+        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+        file_names = read_file_names(folder_path)
+        for file_name in file_names:
+            listboxLeftAdd.insert(tk.END, file_name)
+
+
+
         inputAuthor.delete("0", tk.END)
         inputDate.delete("0", tk.END)
         inputMessage.delete("1.0", tk.END)
@@ -305,19 +324,11 @@ def add():
         show_popup()
 
 
-        
-       
+
 
 
     buttonArchive = Button(windowAdd, text="Archive message", command=archive, background="maroon1", activebackground="palegreen", font=18, highlightthickness=0)
     buttonArchive.place(x=50, y=690, width=200, height=40)
-
-
-
-
-
-
-
 
 
 ##############################################
@@ -334,6 +345,7 @@ def readme():
 
 def quit():
     sys.exit()
+    pygame.mixer.music.stop()
 
 buttonRead = Button(text="Read archive", command=read, background="maroon1", activebackground="palegreen", foreground="white", highlightthickness=0, font=18)
 buttonRead.place(x=200, y=60, width=200, height=40)
@@ -346,7 +358,5 @@ buttonReadme.place(x=225, y=220, width=150, height=30)
 
 buttonQuit = Button(text="Quit", command=quit, background="black", activebackground="orangered", foreground="white", highlightthickness=0)
 buttonQuit.place(x=250, y=300, width=100, height=40)
-
-
 
 windowMenu.mainloop()
