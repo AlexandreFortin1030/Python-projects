@@ -5,16 +5,9 @@ import sys
 import json
 import os
 import datetime
-import pygame
 
-pygame.mixer.init()
-
-def play_sound_in_loop():
-    pygame.mixer.music.load("RessourceMenu/yung lean ~ ginseng strip 2002 (instrumental slowed+reverb) (256).mp3")
-    pygame.mixer.music.play(loops=-1)
 
 windowMenu = Tk()
-play_sound_in_loop() 
 windowMenu.title("Mail Archiver")
 windowMenu.geometry("600x400")
 windowMenu["bg"]="mediumorchid2"
@@ -92,7 +85,7 @@ def read():
     listboxLeft = Listbox(listbox_frameLeft,)
     listboxLeft.pack(side="left", fill="both", expand=True)
 
-    folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+    folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
     file_names = read_file_names(folder_path)
     for file_name in file_names:
         listboxLeft.insert(tk.END, file_name)
@@ -112,7 +105,7 @@ def read():
 
 
     def deleteMessageById():
-        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        folder_path = "Archive"
         author = inputAuthor.get() 
         file_name = f"{author}.json"
         file_path = os.path.join(folder_path, file_name)
@@ -137,7 +130,7 @@ def read():
 
     def loadMessage():
 
-        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"  # Remplacez par votre chemin
+        folder_path = "Archive"  # Remplacez par votre chemin
         file_name = inputAuthor.get() + ".json"
         file_path = os.path.join(folder_path, file_name)
 
@@ -150,6 +143,20 @@ def read():
                 inner_value = value[inner_key]
                 textMain.insert(tk.END, f"Message ID: {key}\n\nDate: {inner_key}\n\n{inner_value}\n\n\n\n")
 
+    def deleteAuthor():
+        author = inputAuthor.get()
+        file_name = f"{author}.json"
+        file_path = f"Archive/{file_name}"
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        listboxLeft.delete(0, tk.END)
+
+        folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+        file_names = read_file_names(folder_path)
+        for file_name in file_names:
+            listboxLeft.insert(tk.END, file_name)
+
+        inputAuthor.delete("0", tk.END)
 
 
 
@@ -157,7 +164,10 @@ def read():
     buttonLoadLeft.place(x=50, y=590, width=200, height=40)
 
     buttonDeleteLeft = Button(windowRead, text="Delete message", command=deleteMessageById, background="maroon1", activebackground="red", font=18, highlightthickness=0)
-    buttonDeleteLeft.place(x=50, y=660, width=200, height=30)
+    buttonDeleteLeft.place(x=75, y=690, width=150, height=30)
+
+    buttonDeleteAuthorLeft = Button(windowRead, text="Delete author", command=deleteAuthor, background="maroon1", activebackground="red", font=18, highlightthickness=0)
+    buttonDeleteAuthorLeft.place(x=75, y=750, width=150, height=30)
 
 
 
@@ -220,7 +230,7 @@ def add():
         return file_names
 
 
-    folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+    folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
     file_names = read_file_names(folder_path)
     for file_name in file_names:
         listboxLeftAdd.insert(tk.END, file_name)
@@ -268,7 +278,7 @@ def add():
         author = inputAuthor.get()
         date = inputDate.get()
 
-        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        folder_path = "Archive"
         file_name = f"{author}.json"
         file_path = os.path.join(folder_path, file_name)
         message = inputMessage.get("1.0", tk.END)
@@ -281,7 +291,7 @@ def add():
             id = 1       
 
         newdata = {id:{date : message}}
-        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"
+        folder_path = "Archive"
         file_name = f"{author}.json"
         file_path = os.path.join(folder_path, file_name)
 
@@ -310,10 +320,11 @@ def add():
 
         listboxLeftAdd.delete(0, tk.END)
 
-        folder_path = "/home/alexandre/Documents/soloDevProjects/python/Python_projects/MailArchiver/Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+        folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
         file_names = read_file_names(folder_path)
         for file_name in file_names:
             listboxLeftAdd.insert(tk.END, file_name)
+
 
 
 
@@ -345,7 +356,6 @@ def readme():
 
 def quit():
     sys.exit()
-    pygame.mixer.music.stop()
 
 buttonRead = Button(text="Read archive", command=read, background="maroon1", activebackground="palegreen", foreground="white", highlightthickness=0, font=18)
 buttonRead.place(x=200, y=60, width=200, height=40)
