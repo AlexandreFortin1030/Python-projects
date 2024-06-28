@@ -1,1 +1,1 @@
-A small program to get to know python and GUI making better. It allows users to save their old emails that they want to keep locally with the name of the author and the date. They can then access it with a read only mode. The GUI is made with very special colors, since it is a command from a particular person.
+A small program to get to know python and GUI making better. It allows users to save their old emails they want to keep locally with the name of the author and the date. They can then access it with a read only mode.
