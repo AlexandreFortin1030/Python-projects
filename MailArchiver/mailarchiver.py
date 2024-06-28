@@ -151,7 +151,7 @@ def read():
             os.remove(file_path)
         listboxLeft.delete(0, tk.END)
 
-        folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+        folder_path = "Archive"
         file_names = read_file_names(folder_path)
         for file_name in file_names:
             listboxLeft.insert(tk.END, file_name)
@@ -230,7 +230,7 @@ def add():
         return file_names
 
 
-    folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+    folder_path = "Archive"
     file_names = read_file_names(folder_path)
     for file_name in file_names:
         listboxLeftAdd.insert(tk.END, file_name)
@@ -320,7 +320,7 @@ def add():
 
         listboxLeftAdd.delete(0, tk.END)
 
-        folder_path = "Archive"   # !! Une fois compilé, le path change car plus sur mon arborescence perso!!
+        folder_path = "Archive"
         file_names = read_file_names(folder_path)
         for file_name in file_names:
             listboxLeftAdd.insert(tk.END, file_name)
