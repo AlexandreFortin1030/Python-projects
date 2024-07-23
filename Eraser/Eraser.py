@@ -1,124 +1,161 @@
-from tkinter import *
 import tkinter as tk
+from tkinter import PhotoImage, filedialog
 from tkinter import ttk
-from tkinter import filedialog
-import sys
-import random
 import os
+import sys
+from cryptography.fernet import Fernet 
 
-
-root = Tk()
+root = tk.Tk()
 root.title("Eraser")
 root.geometry("600x450")
-bg = PhotoImage(file = "./blurry.png") 
+bg = PhotoImage(file="./blurry.png")
 
-background_label = Label(root, image=bg)
+background_label = tk.Label(root, image=bg)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+# Global variable to store the selected file path
+selected_file_path = None
 
 ########################## Functions
 
 
-
-###---------> Erase File _
+#####--------> Erase File
 
 def erase_file_window():
-    windowFile = tk.Toplevel(root) 
-    windowFile.geometry("600x600")
+    windowFile = tk.Toplevel(root)
+    windowFile.geometry("600x700")
     windowFile.title("Erase file")
-    windowFile["bg"]= "black"
+    windowFile["bg"] = "black"
 
-    bg = PhotoImage(file = "./eraseFile.png") 
+    bg = PhotoImage(file="./eraseFile.png")
 
-    background_label = Label(windowFile, image=bg, border=0)
+    background_label = tk.Label(windowFile, image=bg, border=0)
     background_label.image = bg
     background_label.pack(pady=20)
 
-
     def select_file():
-        global file_path
+        global selected_file_path
         file_path = filedialog.askopenfilename()
         if file_path:
+            selected_file_path = file_path
             selected_file_label.config(text=f"---> Selected file: {file_path}", foreground="chartreuse1")
 
-    select_button = Button(windowFile, text="Select file", command=select_file, highlightthickness=0, background="darkorange1")
+    select_button = tk.Button(windowFile, text="Select file", command=select_file, highlightthickness=0, background="darkorange1")
     select_button.pack(pady=20)
 
-    selected_file_label = Label(windowFile, text="---> No file selected yet", background="black", foreground="White")
+    about_label = tk.Label(windowFile, text="Click the above button and select a file (not a directory) in your file system.\n Please ignore all files and directories starting with a dot (ex: '.filename')\n as they are hidden files that you are mostly likely not supposed to alter.\n Be careful to select and erase only well-known files as you might\n destroy your whole system ;)", background="black", foreground="white")
+    about_label.pack(pady=20)
+
+    global selected_file_label
+    selected_file_label = tk.Label(windowFile, text="---> No file selected yet", background="black", foreground="White")
     selected_file_label.pack(pady=10)
 
-    About_label = Label(windowFile, text="Click the above button and select a file (not a directory) in your file system.\n Please ignore all files and directories starting with a dot (ex: '.filename')\n as they are hidden files that you are mosty likely not supposed to alter.\n Becareful to select and erase only well known files as you might\n destroy your whole system ;)", background="black", foreground="white")
-    About_label.pack(pady=20)
+    progress = ttk.Progressbar(windowFile, orient="horizontal", length=300, mode="determinate")
+    progress.pack(pady=20)
 
+    def erase_file():
+        global selected_file_path
+        if not selected_file_path:
+            selected_file_label.config(text="---> No file selected to erase", foreground="red")
+            return
 
-    def erase_file(file_path, num_passes=6 ):
+        file_path = selected_file_path
         if not os.path.isfile(file_path):
-            raise ValueError("The provided path does not point to a valid file")
+            selected_file_label.config(text="---> Invalid file selected", foreground="red")
+            return
+        
+        # single file encryption
+
+        def encrypt_file(file_path):
+            key_gen = Fernet.generate_key()
+            key = Fernet(key_gen)
+            with open(file_path, 'rb') as file:
+                file_content = file.read()
+                print(file_content)
+                # ok until here
+                encrypted_content = key.encrypt(file_content)
+            with open(file_path, 'wb') as file:
+                file.write(encrypted_content)
+
+            with open(file_path, "rb") as encrypted_file:
+                test = encrypted_file.read()
+                print(test)
+
+        ### Initialize encryption
+        encrypt_file(file_path)
+
 
         file_size = os.path.getsize(file_path)
+        num_passes = 12
 
-        with open(file_path, "r+b") as file:
-            for i in range (num_passes):
-                file.seek(0)
-                file.write(os.uramdom(file_size))
-                file.slush()
-                
+        try:
+            with open(file_path, "r+b") as file:
+                for pass_num in range(num_passes):
+                    file.seek(0)
+                    file.write(os.urandom(file_size))
+                    file.flush()
+                    os.fsync(file.fileno())
 
+                    # Update the progress bar
+                    progress["value"] = (pass_num + 1) / num_passes * 100
+                    windowFile.update_idletasks()
 
-    erase_button = Button(windowFile, text="   Erase file   ", command=erase_file, highlightthickness=0, background="firebrick1")
+            with open(file_path, "r+b") as file:
+                file.truncate(0)
+
+            os.remove(file_path)
+            selected_file_label.config(text="---> File erased successfully", foreground="chartreuse1")
+        except Exception as e:
+            selected_file_label.config(text=f"Error erasing file: {e}", foreground="red")
+
+    erase_button = tk.Button(windowFile, text="Erase file", command=erase_file, highlightthickness=0, background="firebrick1")
     erase_button.pack(pady=30)
-
-
 
     windowFile.grab_set()
 
 
 
-###---------> Cleab Device _
+
+
+#####--------> Clean Device
+
 
 def clean_device_window():
-    windowDevice = tk.Toplevel(root) 
-    windowDevice.geometry("600x300")
-    windowDevice.title("Clean device")
+    windowDevice = tk.Toplevel(root)
+    windowDevice.geometry("600x700")
+    windowDevice.title("Erase file")
+    windowDevice["bg"] = "black"
 
-    buttonCleanDevice = Button(text="Clean selected device")
+    bg = PhotoImage(file="./eraseFile.png")
 
-
-
-
+    background_label = tk.Label(windowDevice, image=bg, border=0)
+    background_label.image = bg
+    background_label.pack(pady=20)
     windowDevice.grab_set()
-    windowDevice.mainloop()
+
+    # multi file encryption (use os module to gather all file from device into one array of files and use a loop after wards to )
 
 
 
-###---------> Quit _
-    
 
-def quit():
+#####--------> Quit
+
+
+def quit_app():
     sys.exit()
 
 ##################### Main Buttons
 
-button1 = Button(text="Erase file", command=erase_file_window, highlightthickness=0, activebackground="orangered1")
+button1 = tk.Button(root, text="Erase file", command=erase_file_window, highlightthickness=0, activebackground="orangered1")
 button1.place(x=200, y=200, width=200, height=40)
-button1["bg"]="lightpink"
+button1["bg"] = "lightpink"
 
-button2 = Button(text="Clean device", command=clean_device_window, highlightthickness=0, activebackground="orangered2")
+button2 = tk.Button(root, text="Clean device", command=clean_device_window, highlightthickness=0, activebackground="orangered2")
 button2.place(x=200, y=270, width=200, height=40)
-button2["bg"]="lightpink2"
+button2["bg"] = "lightpink2"
 
-button3 = Button(text="Quit", command=quit, highlightthickness=0, activebackground="orangered3")
+button3 = tk.Button(root, text="Quit", command=quit_app, highlightthickness=0, activebackground="orangered3")
 button3.place(x=200, y=340, width=200, height=40)
-button3["bg"]="lightpink4"
-
-
-
-
-
-
+button3["bg"] = "lightpink4"
 
 root.mainloop()
-
-
-# Remains:
-# finish basic logic and functions for erase file and clean device windows
-# add a progress hint for each process as it takes a long time.
